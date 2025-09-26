@@ -1,4 +1,13 @@
 <?php
+session_start();
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header("Location: admin_login.php");
+    exit;
+}
+?>
+
+
+<?php
 // admin.php — Dashboard xem DB (Tickets & Contacts) với Bootstrap 5
 // Đặt cạnh db.php. Mặc định hiển thị 200 bản ghi mới nhất mỗi bảng.
 // (Tuỳ chọn) Bảo vệ bằng mật khẩu đơn giản:
@@ -93,6 +102,7 @@ $rsCnt2 = $conn->query("SELECT FOUND_ROWS() AS c"); $cont_count = (int)($rsCnt2-
 
     <div class="d-flex align-items-center justify-content-between mb-3 sticky-top-lite">
       <h3 class="mb-0">Admin Dashboard</h3>
+      <a href="logout.php" class="btn btn-danger" style="margin-left: 700px;">Logout</a>
       <a class="btn btn-secondary" href="index.php">← Back to site</a>
     </div>
 
@@ -212,6 +222,8 @@ $rsCnt2 = $conn->query("SELECT FOUND_ROWS() AS c"); $cont_count = (int)($rsCnt2-
           </table>
         </div>
       </div>
+
+      
 
     <?php endif; ?>
 
