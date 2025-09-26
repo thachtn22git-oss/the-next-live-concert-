@@ -198,27 +198,27 @@ https://templatemo.com/tm-583-festava-live
 
                         <ul class="site-footer-links">
                             <li class="site-footer-link-item">
-                                <a href="#section_1" class="site-footer-link">Home</a>
+                                <a href="./index.php#section_1" class="site-footer-link">Home</a>
                             </li>
 
                             <li class="site-footer-link-item">
-                                <a href="#section_2" class="site-footer-link">About</a>
+                                <a href="./index.php#section_2" class="site-footer-link">About</a>
                             </li>
 
                             <li class="site-footer-link-item">
-                                <a href="#section_3" class="site-footer-link">Artists</a>
+                                <a href="./index.php#section_3" class="site-footer-link">Artists</a>
                             </li>
 
                             <li class="site-footer-link-item">
-                                <a href="#section_4" class="site-footer-link">Schedule</a>
+                                <a href="./index.php#section_4" class="site-footer-link">Schedule</a>
                             </li>
 
                             <li class="site-footer-link-item">
-                                <a href="#section_5" class="site-footer-link">Pricing</a>
+                                <a href="./index.php#section_5" class="site-footer-link">Pricing</a>
                             </li>
 
                             <li class="site-footer-link-item">
-                                <a href="#section_6" class="site-footer-link">Contact</a>
+                                <a href="./index.php#section_6" class="site-footer-link">Contact</a>
                             </li>
                         </ul>
                     </div>
@@ -366,82 +366,50 @@ https://templatemo.com/tm-583-festava-live
             });
         </script>
 
-        <!-- <script>
-            $("#ticketForm").on("submit", function(e){
-            e.preventDefault();
-
-            // Lấy dữ liệu từ form
-            const data = $(this).serialize(); // name, email, phone, TicketForm, number...
-
-            $.post("purchase_process.php", data, function(res){
-                try {
-                const r = JSON.parse(res);
-                if (r.status === "ok") {
-                    // Cách 1: chuyển hướng sang trang thanh toán của MoMo
-                    window.location.href = r.payUrl;
-
-                    // (Tuỳ chọn) Cách 2: hiện QR nếu có r.qrCodeUrl
-                    // $("#qrImg").attr("src", r.qrCodeUrl).show();
-                } else {
-                    alert("Thanh toán lỗi: " + (r.message || "Unknown"));
-                }
-                } catch(e){
-                alert("Có lỗi xảy ra, vui lòng thử lại.");
-                }
-            });
-            });
-        </script> -->
-
-        <!-- <script>
-            $("#ticketForm").on("submit", function(e){
-            e.preventDefault();
-            const btn=$(this).find('button[type="submit"]');
-            btn.prop('disabled', true).text('Processing...');
-            $.post("purchase_process.php", $(this).serialize(), function(res){
-                const r = typeof res==='string' ? JSON.parse(res) : res;
-                if (r.status==="ok" && r.payUrl){
-                // Nếu đang duyệt trên mobile & có deeplink, ưu tiên deeplink:
-                if (/Mobi|Android/i.test(navigator.userAgent) && r.deeplink) {
-                    window.location.href = r.deeplink;
-                } else {
-                    window.location.href = r.payUrl; // dùng NGAY link
-                }
-                } else {
-                alert("Thanh toán lỗi: " + (r.message || "Không nhận được payUrl"));
-                btn.prop('disabled', false).text('Buy Ticket');
-                }
-            }).fail(function(){
-                alert("Không kết nối được server.");
-                btn.prop('disabled', false).text('Buy Ticket');
-            });
-            });
-        </script> -->
-
-        <script>
+<script>
 $(function(){
   $("#ticketForm").on("submit", function(e){
     e.preventDefault();
     const $btn = $(this).find('button[type="submit"]');
     $btn.prop('disabled', true).text('Processing...');
 
-    $.post("save_ticket.php", $(this).serialize(), function(res){
-      const r = (typeof res === 'string') ? JSON.parse(res) : res;
-      if (r.status === 'ok') {
-        // dùng amount_text server trả về để tránh lệch format
-        alert("Đặt vé thành công!\nMã đơn: " + r.order_id + "\nLoại vé: " + r.ticket_type + "\nSố lượng: " + r.quantity + "\nTổng tiền: " + r.amount_text);
+    $.post("purchase_and_save.php", $(this).serialize(), function(res){
+      let r = (typeof res === 'string') ? JSON.parse(res) : res;
+
+      if (r.status === 'ok' && r.payUrl) {
+        // 1) Báo đã lưu + tổng tiền
+        alert("Đã lưu đơn vào DB!\nMã đơn: " + r.order_id +
+              "\nLoại vé: " + r.ticket_type +
+              "\nSố lượng: " + r.quantity +
+              "\nTổng tiền: " + r.amount_text +
+              "\n\nTiếp tục chuyển đến MoMo để quét QR.");
+        // 2) Redirect sang trang MoMo (kể cả sau này quét có 1005 thì vẫn đã lưu DB rồi)
+        // Ưu tiên deeplink nếu là mobile
+        if (/Mobi|Android/i.test(navigator.userAgent) && r.deeplink) {
+          window.location.href = r.deeplink;
+        } else {
+          window.location.href = r.payUrl;
+        }
+      } else if (r.status === 'saved_only') {
+        alert("Đã lưu đơn vào DB!\nMã đơn: " + r.order_id +
+              "\nTổng tiền: " + (r.amount_text || (r.amount ? r.amount.toLocaleString('vi-VN')+' VND' : '')) +
+              "\n\nLưu ý: hiện không tạo được link MoMo. Bạn có thể thử lại sau.");
+        // Không có payUrl để chuyển, ở lại trang
         $("#ticketForm")[0].reset();
         $("#ticket-form-message").val('');
+        $btn.prop('disabled', false).text('Buy Ticket');
       } else {
         alert("Lỗi: " + (r.message || "Không xác định"));
+        $btn.prop('disabled', false).text('Buy Ticket');
       }
     }).fail(function(){
       alert("Không kết nối được máy chủ.");
-    }).always(function(){
       $btn.prop('disabled', false).text('Buy Ticket');
     });
   });
 });
 </script>
+
 
 
 
