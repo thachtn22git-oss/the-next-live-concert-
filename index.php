@@ -278,11 +278,10 @@ https://templatemo.com/tm-583-festava-live
                                     </p>
                                 </div>
                             </div>
-                            
-                            
-
-                            
                         </div>
+
+                        
+
                         <div class="col-lg-5 col-12">
                             <div class="artists-thumb">
                                 <div class="artists-image-wrap">

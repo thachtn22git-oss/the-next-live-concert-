@@ -137,9 +137,9 @@ https://templatemo.com/tm-583-festava-live
                                     <p>Combo 5 – Save 5%: Applicable for purchases of 5 to 9 tickets in a single order.</p>
                                     <p>Group of 10 or more – Save 10%: Applicable for purchases of 10 or more tickets in a single order.</p>
                                     <p>(Valid only for the same ticket category)</p>
-                                    <input type="number" name="ticket-form-number" id="ticket-form-number" class="form-control" placeholder="Number of Tickets" required>
+                                    <input type="number" name="ticket-form-number" id="ticket-form-number" class="form-control" placeholder="Number of Tickets" required  min="1">
 
-                                    <textarea name="ticket-form-message" rows="1" class="form-control" id="ticket-form-message" placeholder="Total Price"></textarea>
+                                    <textarea name="ticket-form-message" rows="1" class="form-control" id="ticket-form-message" placeholder="Total Price" style="resize: none;"></textarea>
 
                                     <div  id="ticketForm" class="col-lg-4 col-md-10 col-8 mx-auto" method="post">
                                         <button  type="submit" class="form-control">Buy Ticket</button>
